@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rueda de Sabor del Café (D3.js)</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Rueda de Sabor del Café</h1>
+        <div class="wheel-container">
+            <svg id="coffee-wheel" width="700" height="700"></svg>
+        </div>
+        <div id="flavor-info">
+            <h2>Trayectoria del Sabor:</h2>
+            <p id="selected-flavor">Pasa el ratón sobre la rueda</p>
+        </div>
+    </div>
+
+    <!-- Carga de la librería D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Nuestro script -->
+    <script src="script.js"></script>
+</body>
+</html>

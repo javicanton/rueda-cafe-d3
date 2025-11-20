@@ -1,0 +1,80 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.container {
+    text-align: center;
+    max-width: 800px;
+}
+
+h1 {
+    color: #4a2c2a;
+    margin-bottom: 20px;
+}
+
+.wheel-container {
+    display: inline-block;
+    background-color: #fff;
+    border-radius: 50%;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+#flavor-info {
+    background-color: #fff;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    display: inline-block;
+    margin-top: 20px;
+    min-height: 60px;
+}
+
+#flavor-info h2 {
+    margin-top: 0;
+    color: #6a4c42;
+}
+
+#selected-flavor {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #c8a882;
+}
+
+/* Estilos para los elementos de la rueda */
+#coffee-wheel .segment {
+    cursor: pointer;
+    stroke: #fff;
+    stroke-width: 2;
+    transition: opacity 0.2s ease;
+}
+
+#coffee-wheel .segment:hover {
+    opacity: 0.8;
+}
+
+/* Estilo para los segmentos resaltados al pasar el ratón */
+#coffee-wheel .segment.highlight {
+    opacity: 1;
+    filter: brightness(1.1);
+}
+
+/* Estilo para los segmentos que no están en la trayectoria */
+#coffee-wheel .segment.fade {
+    opacity: 0.3;
+}
+
+/* Estilo para las etiquetas de texto */
+#coffee-wheel .label {
+    font-size: 12px;
+    font-weight: 600;
+    pointer-events: none; /* Para que el texto no interfiera con los eventos del ratón en el segmento */
+    text-anchor: middle;
+    fill: #333;
+}
