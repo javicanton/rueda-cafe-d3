@@ -6,6 +6,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const height = 800;
     const radius = Math.min(width, height) / 2;
 
+    const wheelRadiusScale = d3.scalePow()
+        .exponent(1.3) // imita la escala radial del ejemplo original
+        .domain([0, 1])
+        .range([0, radius]);
+
+    const angleScale = d3.scaleLinear().range([0, 2 * Math.PI]);
+    const leafTrim = radius * 0.26; // recorte del anillo exterior para que no llegue al borde
+
     const svg = d3.select("#coffee-wheel")
         .attr("width", width)
         .attr("height", height);
@@ -13,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const g = svg.append("g")
         .attr("transform", `translate(${width / 2},${height / 2})`);
 
-    const partition = d3.partition();
+    const partition = d3.partition().size([2 * Math.PI, 1]);
 
 
     // 2. CARGA Y TRANSFORMACIÓN DE DATOS DESDE CSV
@@ -69,17 +77,19 @@ document.addEventListener('DOMContentLoaded', () => {
             .sum(d => d.children ? 0 : 1) // Valor para nodos hoja
             .sort((a, b) => b.value - a.value);
         
-        // Ajustar el layout para que cada nivel tenga el mismo grosor radial
-        partition.size([2 * Math.PI, root.height + 1])(root);
-        const radialScale = radius / (root.height + 1); // Escala para traducir niveles a píxeles
+        partition(root);
+        const maxDepth = root.height;
 
         const arc = d3.arc()
             .startAngle(d => d.x0)
             .endAngle(d => d.x1)
-            .padAngle(1 / radius)
-            .padRadius(radius * 1.15)
-            .innerRadius(d => d.y0 * radialScale)
-            .outerRadius(d => d.y1 * radialScale - 1);
+            .padAngle(0.002)
+            .padRadius(radius * 1.1)
+            .innerRadius(d => wheelRadiusScale(d.y0))
+            .outerRadius(d => {
+                const outer = wheelRadiusScale(d.y1);
+                return d.depth === maxDepth ? Math.max(outer - leafTrim, wheelRadiusScale(d.y0) + 5) : outer;
+            });
 
 
         // 3. DIBUJO DE LOS ARCOS (SEGMENTOS)
@@ -106,11 +116,12 @@ document.addEventListener('DOMContentLoaded', () => {
             .join("text")
             .attr("class", "label")
             .attr("transform", function(d) {
-                const angle = ((d.x0 + d.x1) / 2) * 180 / Math.PI;
-                const r = ((d.y0 + d.y1) / 2) * radialScale;
-                const rotate = angle - 90;
-                const flip = angle >= 180 ? 180 : 0;
-                return `rotate(${rotate}) translate(${r},0) rotate(${flip})`;
+                const midAngle = (d.x0 + d.x1) / 2;
+                const angleDeg = midAngle * 180 / Math.PI;
+                const isRightSide = angleDeg < 90 || angleDeg > 270;
+                const r = wheelRadiusScale((d.y0 + d.y1) / 2) - (d.depth === maxDepth ? leafTrim / 2 : 0);
+                const rotate = angleDeg - 90;
+                return `rotate(${rotate}) translate(${r},0) rotate(${isRightSide ? 0 : 180})`;
             })
             .attr("dy", "0.35em")
             .text(d => d.data.name);
