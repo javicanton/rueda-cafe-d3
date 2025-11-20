@@ -2,8 +2,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 1. CONFIGURACIÓN
     // ============================
-    const width = 800;
-    const height = 800;
+    const width = 880;
+    const height = 880;
     const radius = Math.min(width, height) / 2;
 
     const colorPalette = {
@@ -135,8 +135,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `rotate(${rotate}) translate(${r},0) rotate(${isRightSide ? 0 : 180})`;
             })
             .attr("dy", "0.35em")
-            .style("fill", d => (d.depth < 3 ? "#fff" : "#000"))
-            .text(d => d.data.name);
+            .attr("text-anchor", d => {
+                const midAngle = (d.x0 + d.x1) / 2;
+                const angleDeg = midAngle * 180 / Math.PI;
+                return angleDeg < 180 ? "start" : "end";
+            })
+            .style("fill", "#fff")
+            .each(function(d) {
+                const text = d3.select(this);
+                const parts = d.data.name.split("/");
+                if (parts.length > 1) {
+                    text.text(null);
+                    parts.forEach((p, i) => {
+                        text.append("tspan")
+                            .attr("x", 0)
+                            .attr("dy", i === 0 ? 0 : "1.1em")
+                            .text(p.trim());
+                    });
+                } else {
+                    text.text(d.data.name);
+                }
+            });
 
         const leafGroups = g.selectAll("g.leaf-label")
             .data(leafLabels)
@@ -151,18 +170,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `rotate(${rotate}) translate(${r},0) rotate(${isRightSide ? 0 : 180})`;
             });
 
-        leafGroups.append("rect")
-            .attr("x", -2)
-            .attr("y", -4)
-            .attr("width", 8)
-            .attr("height", 8)
-            .attr("fill", d => d.data.color || "#000")
-            .attr("stroke", "#fff")
-            .attr("stroke-width", 0.5);
-
         leafGroups.append("text")
             .attr("dy", "0.35em")
-            .attr("x", 8 + 4)
+            .attr("x", 0)
+            .attr("text-anchor", d => {
+                const midAngle = (d.x0 + d.x1) / 2;
+                const angleDeg = midAngle * 180 / Math.PI;
+                return angleDeg < 180 ? "start" : "end";
+            })
             .text(d => d.data.name);
 
 
