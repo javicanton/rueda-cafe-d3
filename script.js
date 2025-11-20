@@ -13,14 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const g = svg.append("g")
         .attr("transform", `translate(${width / 2},${height / 2})`);
 
-    const partition = d3.partition()
-        .size([2 * Math.PI, radius]);
-
-    const arc = d3.arc()
-        .startAngle(d => d.x0)
-        .endAngle(d => d.x1)
-        .innerRadius(d => d.y0)
-        .outerRadius(d => d.y1);
+    const partition = d3.partition();
 
 
     // 2. CARGA Y TRANSFORMACIÓN DE DATOS DESDE CSV
@@ -76,13 +69,25 @@ document.addEventListener('DOMContentLoaded', () => {
             .sum(d => d.children ? 0 : 1) // Valor para nodos hoja
             .sort((a, b) => b.value - a.value);
         
-        partition(root);
+        // Ajustar el layout para que cada nivel tenga el mismo grosor radial
+        partition.size([2 * Math.PI, root.height + 1])(root);
+        const radialScale = radius / (root.height + 1); // Escala para traducir niveles a píxeles
+
+        const arc = d3.arc()
+            .startAngle(d => d.x0)
+            .endAngle(d => d.x1)
+            .padAngle(1 / radius)
+            .padRadius(radius * 1.15)
+            .innerRadius(d => d.y0 * radialScale)
+            .outerRadius(d => d.y1 * radialScale - 1);
 
 
         // 3. DIBUJO DE LOS ARCOS (SEGMENTOS)
         // ===================================
+        const nodes = root.descendants().filter(d => d.depth > 0);
+
         const segment = g.selectAll("path")
-            .data(root.descendants())
+            .data(nodes)
             .join("path")
             .attr("class", "segment")
             .attr("d", arc)
@@ -94,19 +99,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // 4. DIBUJO DE LAS ETIQUETAS
         // ===========================
         const label = g.selectAll("text")
-            .data(root.descendants().filter(d => {
-                // Filtrar para mostrar solo etiquetas que quepan y no sean el nodo raíz
-                return d.depth && (d.y1 - d.y0) > 15;
+            .data(nodes.filter(d => {
+                // Mostrar solo etiquetas que quepan en el arco
+                return (d.x1 - d.x0) > 0.012;
             }))
             .join("text")
             .attr("class", "label")
             .attr("transform", function(d) {
-                const x = (d.x0 + d.x1) / 2;
-                const y = (d.y0 + d.y1) / 2;
-                const rotation = x < Math.PI ? (x * 180 / Math.PI - 90) : (x * 180 / Math.PI + 90);
-                // Rotar el texto para que siempre quede hacia afuera
-                const isFlipped = x > Math.PI;
-                return `rotate(${rotation}) translate(${y},0) rotate(${isFlipped ? 180 : 0})`;
+                const angle = ((d.x0 + d.x1) / 2) * 180 / Math.PI;
+                const r = ((d.y0 + d.y1) / 2) * radialScale;
+                const rotate = angle - 90;
+                const flip = angle >= 180 ? 180 : 0;
+                return `rotate(${rotate}) translate(${r},0) rotate(${flip})`;
             })
             .attr("dy", "0.35em")
             .text(d => d.data.name);
