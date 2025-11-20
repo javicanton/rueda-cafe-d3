@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rueda de Sabor del Café (D3.js)</title>
+    <title>Rueda de Sabor del Café</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <div class="container">
         <h1>Rueda de Sabor del Café</h1>
         <div class="wheel-container">
-            <svg id="coffee-wheel" width="700" height="700"></svg>
+            <svg id="coffee-wheel" width="800" height="800"></svg>
         </div>
         <div id="flavor-info">
             <h2>Trayectoria del Sabor:</h2>
-            <p id="selected-flavor">Pasa el ratón sobre la rueda</p>
+            <p id="selected-flavor-path">Pasa el ratón sobre la rueda</p>
+            <p id="selected-flavor-description"></p>
         </div>
     </div>
 
