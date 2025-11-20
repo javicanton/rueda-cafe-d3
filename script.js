@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .attr("transform", function(d) {
                 const midAngle = (d.x0 + d.x1) / 2;
                 const angleDeg = midAngle * 180 / Math.PI;
-                const isRightSide = angleDeg < 180;
+                const isRightSide = Math.sin(midAngle) >= 0;
                 const r = wheelRadiusScale(d.y0) + 8; // pegado al centro del anillo
                 const rotate = angleDeg - 90;
                 return `rotate(${rotate}) translate(${r},0) rotate(${isRightSide ? 0 : 180})`;
@@ -137,13 +137,13 @@ document.addEventListener('DOMContentLoaded', () => {
             .attr("dy", "0.35em")
             .attr("text-anchor", d => {
                 const midAngle = (d.x0 + d.x1) / 2;
-                const angleDeg = midAngle * 180 / Math.PI;
-                return angleDeg < 180 ? "start" : "end";
+                const isRightSide = Math.sin(midAngle) >= 0;
+                return isRightSide ? "start" : "end";
             })
             .attr("dx", d => {
                 const midAngle = (d.x0 + d.x1) / 2;
-                const angleDeg = midAngle * 180 / Math.PI;
-                return angleDeg < 180 ? 4 : -6; // empuja hacia el centro
+                const isRightSide = Math.sin(midAngle) >= 0;
+                return isRightSide ? 4 : -4; // empuja hacia el centro según lado
             })
             .style("fill", "#fff")
             .each(function(d) {
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .attr("transform", function(d) {
                 const midAngle = (d.x0 + d.x1) / 2;
                 const angleDeg = midAngle * 180 / Math.PI;
-                const isRightSide = angleDeg < 180;
+                const isRightSide = Math.sin(midAngle) >= 0;
                 const r = wheelRadiusScale(d.y1) - leafTrim + 16; // justo fuera del borde del anillo exterior
                 const rotate = angleDeg - 90;
                 return `rotate(${rotate}) translate(${r},0) rotate(${isRightSide ? 0 : 180})`;
@@ -179,11 +179,13 @@ document.addEventListener('DOMContentLoaded', () => {
             .attr("dy", "0.35em")
             .attr("x", d => {
                 const midAngle = (d.x0 + d.x1) / 2;
-                return midAngle < Math.PI ? 4 : -4; // pequeño offset hacia fuera
+                const isRightSide = Math.sin(midAngle) >= 0;
+                return isRightSide ? 4 : -4; // pequeño offset hacia fuera
             })
             .attr("text-anchor", d => {
                 const midAngle = (d.x0 + d.x1) / 2;
-                return midAngle < Math.PI ? "start" : "end";
+                const isRightSide = Math.sin(midAngle) >= 0;
+                return isRightSide ? "start" : "end";
             })
             .text(d => d.data.name);
 
