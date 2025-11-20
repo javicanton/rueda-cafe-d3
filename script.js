@@ -140,6 +140,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const angleDeg = midAngle * 180 / Math.PI;
                 return angleDeg < 180 ? "start" : "end";
             })
+            .attr("dx", d => {
+                const midAngle = (d.x0 + d.x1) / 2;
+                const angleDeg = midAngle * 180 / Math.PI;
+                return angleDeg < 180 ? 4 : -6; // empuja hacia el centro
+            })
             .style("fill", "#fff")
             .each(function(d) {
                 const text = d3.select(this);
@@ -172,7 +177,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         leafGroups.append("text")
             .attr("dy", "0.35em")
-            .attr("x", 0)
+            .attr("x", d => {
+                const midAngle = (d.x0 + d.x1) / 2;
+                const angleDeg = midAngle * 180 / Math.PI;
+                return angleDeg < 180 ? 4 : -6;
+            })
             .attr("text-anchor", d => {
                 const midAngle = (d.x0 + d.x1) / 2;
                 const angleDeg = midAngle * 180 / Math.PI;
