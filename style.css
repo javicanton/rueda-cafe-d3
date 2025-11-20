@@ -28,35 +28,7 @@ h1 {
 }
 
 #flavor-info {
-    background-color: #fff;
-    padding: 20px 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    display: inline-block;
-    margin-top: 20px;
-    min-height: 80px;
-    text-align: left;
-}
-
-#flavor-info h2 {
-    margin-top: 0;
-    color: #6a4c42;
-    font-size: 1.2em;
-}
-
-#selected-flavor-path {
-    font-size: 1.2em;
-    font-weight: 600;
-    color: #c8a882;
-    margin: 5px 0;
-}
-
-#selected-flavor-description {
-    font-size: 1em;
-    font-weight: 400;
-    color: #555;
-    font-style: italic;
-    margin: 5px 0;
+    display: none;
 }
 
 /* Estilos para los elementos de la rueda */
@@ -90,4 +62,60 @@ h1 {
     text-anchor: middle;
     fill: #333;
     text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff;
+}
+
+#tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    padding: 14px 16px;
+    max-width: 340px;
+    border: 1px solid rgba(0,0,0,0.06);
+    opacity: 0;
+    transition: opacity 0.12s ease-in-out;
+    z-index: 10;
+}
+
+#tooltip .tooltip-path {
+    font-size: 11px;
+    font-weight: 600;
+    color: #777;
+    margin-bottom: 6px;
+}
+
+#tooltip .tooltip-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+#tooltip .tooltip-def {
+    font-size: 13px;
+    color: #444;
+    margin-bottom: 8px;
+}
+
+#tooltip table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-top: 6px;
+}
+
+#tooltip th, #tooltip td {
+    text-align: left;
+    padding: 6px 4px;
+}
+
+#tooltip th {
+    font-weight: 700;
+    border-bottom: 1px solid #e5e5e5;
+    color: #333;
+}
+
+#tooltip td {
+    color: #555;
 }
