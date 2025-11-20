@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const midAngle = (d.x0 + d.x1) / 2;
                 const angleDeg = midAngle * 180 / Math.PI;
                 const isRightSide = angleDeg < 180;
-                const r = wheelRadiusScale(d.y1) - leafTrim + 8;
+                const r = wheelRadiusScale(d.y1); // lleva los textos al borde exterior
                 const rotate = angleDeg - 90;
                 return `rotate(${rotate}) translate(${r},0) rotate(${isRightSide ? 0 : 180})`;
             });
@@ -179,13 +179,11 @@ document.addEventListener('DOMContentLoaded', () => {
             .attr("dy", "0.35em")
             .attr("x", d => {
                 const midAngle = (d.x0 + d.x1) / 2;
-                const angleDeg = midAngle * 180 / Math.PI;
-                return angleDeg < 180 ? 4 : -6;
+                return midAngle < Math.PI ? 8 : -8; // saca el texto hacia el exterior
             })
             .attr("text-anchor", d => {
                 const midAngle = (d.x0 + d.x1) / 2;
-                const angleDeg = midAngle * 180 / Math.PI;
-                return angleDeg < 180 ? "start" : "end";
+                return midAngle < Math.PI ? "start" : "end";
             })
             .text(d => d.data.name);
 
