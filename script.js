@@ -24,53 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const partition = d3.partition().size([2 * Math.PI, 1]);
 
 
-    // 2. CARGA Y TRANSFORMACIÓN DE DATOS DESDE CSV
+    // 2. CARGA Y TRANSFORMACIÓN DE DATOS DESDE JSON
     // ==============================================
-    d3.csv("coffee_flavor_wheel.csv").then(function(csvData) {
-        
-        // Función para convertir el CSV plano a una estructura jerárquica (JSON)
-        function transformData(data) {
-            const root = { name: "Raíz", children: [] };
-            const level1Map = new Map();
-
-            data.forEach(row => {
-                // Procesar Nivel1
-                if (!level1Map.has(row.Nivel1)) {
-                    const l1Node = { name: row.Nivel1, color: row.Color, children: [] };
-                    level1Map.set(row.Nivel1, l1Node);
-                    root.children.push(l1Node);
-                }
-                let currentNode = level1Map.get(row.Nivel1);
-
-                // Procesar Nivel2
-                if (row.Nivel2) {
-                    let l2Node = currentNode.children.find(child => child.name === row.Nivel2);
-                    if (!l2Node) {
-                        l2Node = { name: row.Nivel2, color: row.Color || currentNode.color, children: [] };
-                        currentNode.children.push(l2Node);
-                    }
-                    currentNode = l2Node;
-                }
-
-                // Procesar Nivel3
-                if (row.Nivel3) {
-                    let l3Node = currentNode.children.find(child => child.name === row.Nivel3);
-                    if (!l3Node) {
-                        l3Node = { name: row.Nivel3, color: row.Color || currentNode.color };
-                        currentNode.children.push(l3Node);
-                    }
-                    currentNode = l3Node;
-                }
-                
-                // Añadir la definición al nodo más profundo
-                if (row['Definición (Lexicon)']) {
-                    currentNode.definition = row['Definición (Lexicon)'];
-                }
-            });
-            return root;
-        }
-
-        const hierarchicalData = transformData(csvData);
+    d3.json("scaa-2.json").then(function(jsonData) {
+        const hierarchicalData = { name: jsonData.meta?.name || "Raíz", children: jsonData.data };
 
         // Crear la jerarquía D3 y calcular las posiciones
         const root = d3.hierarchy(hierarchicalData)
@@ -162,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
     }).catch(function(error){
-        console.error("Error al cargar o procesar el archivo CSV:", error);
-        d3.select("#flavor-info").html("<h2>Error</h2><p>No se pudo cargar el archivo 'coffee_flavor_wheel.csv'. Asegúrate de que esté en la misma carpeta que el archivo HTML.</p>");
+        console.error("Error al cargar o procesar el archivo JSON:", error);
+        d3.select("#flavor-info").html("<h2>Error</h2><p>No se pudo cargar el archivo 'scaa-2.json'. Asegúrate de que esté en la misma carpeta que el archivo HTML.</p>");
     });
 });
