@@ -1,5 +1,5 @@
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Helvetica', 'Arial', sans-serif;
     background-color: #f4f4f9;
     color: #333;
     display: flex;
@@ -59,14 +59,25 @@ h1 {
     font-size: 11px;
     font-weight: 600;
     pointer-events: none;
-    text-anchor: middle;
-    fill: #333;
-    text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff;
+    text-anchor: end;
+    fill: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+    text-shadow: 0 0 3px rgba(0,0,0,0.25);
+}
+
+#coffee-wheel .leaf-label text {
+    font-size: 11px;
+    font-weight: 600;
+    pointer-events: none;
+    text-anchor: start;
+    fill: #000;
+    font-family: Arial, Helvetica, sans-serif;
+    text-shadow: 0 0 3px #fff;
 }
 
 #tooltip {
     position: absolute;
-    pointer-events: none;
+    pointer-events: auto;
     background: rgba(255, 255, 255, 0.95);
     border-radius: 10px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.15);
@@ -83,6 +94,9 @@ h1 {
     font-weight: 600;
     color: #777;
     margin-bottom: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
 }
 
 #tooltip .tooltip-title {
@@ -118,4 +132,16 @@ h1 {
 
 #tooltip td {
     color: #555;
+}
+
+#tooltip .crumb {
+    background: #f0f0f0;
+    border-radius: 6px;
+    padding: 3px 6px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+#tooltip .crumb:hover {
+    background: #e2e2e2;
 }

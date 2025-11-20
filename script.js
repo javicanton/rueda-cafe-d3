@@ -41,37 +41,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. CARGA Y TRANSFORMACIÓN DE DATOS DESDE JSON
     // ==============================================
-    d3.json("scaa-2.json").then(function(jsonData) {
+    Promise.all([d3.json("scaa-2.json"), d3.json("scaa-original.json")]).then(function([jsonData, original]) {
         const hierarchicalData = { name: jsonData.meta?.name || "Raíz", children: jsonData.data };
 
         // Crear la jerarquía D3 y calcular las posiciones
         const root = d3.hierarchy(hierarchicalData)
             .sum(d => d.children ? 0 : 1) // Valor para nodos hoja
             .sort((a, b) => b.value - a.value);
+        
+        // Copiar colores desde el JSON original por índice; fallback a paleta
+        function copyColors(esNode, origNode) {
+            let color = esNode.data.color;
+            if (origNode && origNode.colour) {
+                color = origNode.colour;
+            } else if (esNode.depth === 1 && colorPalette[esNode.data.name]) {
+                color = colorPalette[esNode.data.name];
+            } else if (!color && esNode.parent) {
+                color = esNode.parent.data.color;
+            }
+            esNode.data.color = color;
 
-        // Aplicar paleta de colores del original
-        function applyColors(node) {
-            let color = node.data.color;
-            if (node.depth === 1 && colorPalette[node.data.name]) {
-                color = colorPalette[node.data.name];
-            }
-            if (!color && node.parent) {
-                color = node.parent.data.color;
-            }
-            if (node.depth > 1 && node.parent && node.parent.data.color) {
-                const base = d3.color(node.parent.data.color);
-                if (base) {
-                    const idx = node.parent.children.indexOf(node);
-                    const t = Math.min(0.6, 0.18 + idx * 0.06 + (node.depth - 1) * 0.05);
-                    color = d3.interpolateLab(base.formatHex(), "#ffffff")(t);
-                } else {
-                    color = node.parent.data.color;
+            const esChildren = esNode.children || [];
+            const origChildren = origNode && origNode.children ? origNode.children : [];
+            const max = Math.max(esChildren.length, origChildren.length);
+            for (let i = 0; i < max; i++) {
+                const esChild = esChildren[i];
+                const origChild = origChildren[i];
+                if (esChild) {
+                    copyColors(esChild, origChild);
                 }
             }
-            node.data.color = color;
-            (node.children || []).forEach(applyColors);
         }
-        root.children.forEach(applyColors);
+        // construir un nodo raíz para original con children
+        const origRoot = original ? { children: original.data } : null;
+        root.children.forEach((child, idx) => {
+            const origChild = origRoot && origRoot.children ? origRoot.children[idx] : null;
+            copyColors(child, origChild);
+        });
         
         partition(root);
         const maxDepth = root.height;
@@ -91,6 +97,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // 3. DIBUJO DE LOS ARCOS (SEGMENTOS)
         // ===================================
         const nodes = root.descendants().filter(d => d.depth > 0);
+        nodes.forEach((d, idx) => {
+            d.data._id = idx + 1;
+        });
+        const nodeById = new Map(nodes.map(d => [String(d.data._id), d]));
+
+        let pinned = null;
+        let pinnedPos = { x: 0, y: 0 };
 
         const segment = g.selectAll("path")
             .data(nodes)
@@ -100,46 +113,73 @@ document.addEventListener('DOMContentLoaded', () => {
             .style("fill", d => d.data.color || '#ccc')
             .on("mouseover", handleMouseOver)
             .on("mousemove", handleMouseMove)
-            .on("mouseout", handleMouseOut);
+            .on("mouseout", handleMouseOut)
+            .on("click", handleClick);
 
 
         // 4. DIBUJO DE LAS ETIQUETAS
         // ===========================
-        const label = g.selectAll("text")
-            .data(nodes.filter(d => {
-                // Mostrar solo etiquetas que quepan en el arco
-                return (d.x1 - d.x0) > 0.012;
-            }))
+        const innerLabels = nodes.filter(d => d.depth < maxDepth && (d.x1 - d.x0) > 0.012);
+        const leafLabels = nodes.filter(d => d.depth === maxDepth && (d.x1 - d.x0) > 0.008);
+
+        g.selectAll("text.label")
+            .data(innerLabels)
             .join("text")
             .attr("class", "label")
             .attr("transform", function(d) {
                 const midAngle = (d.x0 + d.x1) / 2;
                 const angleDeg = midAngle * 180 / Math.PI;
                 const isRightSide = angleDeg < 180;
-                const r = wheelRadiusScale((d.y0 + d.y1) / 2) - (d.depth === maxDepth ? leafTrim / 2 : 0);
+                const r = wheelRadiusScale(d.y0) + 8; // pegado al centro del anillo
                 const rotate = angleDeg - 90;
                 return `rotate(${rotate}) translate(${r},0) rotate(${isRightSide ? 0 : 180})`;
             })
             .attr("dy", "0.35em")
+            .style("fill", d => (d.depth < 3 ? "#fff" : "#000"))
+            .text(d => d.data.name);
+
+        const leafGroups = g.selectAll("g.leaf-label")
+            .data(leafLabels)
+            .join("g")
+            .attr("class", "leaf-label")
+            .attr("transform", function(d) {
+                const midAngle = (d.x0 + d.x1) / 2;
+                const angleDeg = midAngle * 180 / Math.PI;
+                const isRightSide = angleDeg < 180;
+                const r = wheelRadiusScale(d.y1) - leafTrim + 8;
+                const rotate = angleDeg - 90;
+                return `rotate(${rotate}) translate(${r},0) rotate(${isRightSide ? 0 : 180})`;
+            });
+
+        leafGroups.append("rect")
+            .attr("x", -2)
+            .attr("y", -4)
+            .attr("width", 8)
+            .attr("height", 8)
+            .attr("fill", d => d.data.color || "#000")
+            .attr("stroke", "#fff")
+            .attr("stroke-width", 0.5);
+
+        leafGroups.append("text")
+            .attr("dy", "0.35em")
+            .attr("x", 8 + 4)
             .text(d => d.data.name);
 
 
         // 5. FUNCIONES DE INTERACTIVIDAD
         // ===============================
         function handleMouseOver(event, d) {
+            if (pinned && pinned !== d) return;
             const sequence = getAncestors(d);
             const flavorNames = sequence.map(node => node.data.name).join(" > ");
-            const definition = d.data.definition || "";
 
-            renderTooltip(d, flavorNames);
+            renderTooltip(d, sequence);
             tooltip.style("opacity", 1);
-
-            // Resaltar la trayectoria
-            segment.classed("fade", true);
-            segment.classed("highlight", node => sequence.includes(node));
+            highlightOnly(d);
         }
 
         function handleMouseMove(event) {
+            if (pinned) return;
             const padding = 14;
             tooltip
                 .style("left", `${event.pageX + padding}px`)
@@ -147,9 +187,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function handleMouseOut() {
-            // Restaura la visualización
+            if (pinned) return;
             tooltip.style("opacity", 0);
             segment.classed("fade", false).classed("highlight", false);
+        }
+
+        function handleClick(event, d) {
+            event.stopPropagation();
+            const padding = 14;
+            pinned = d;
+            pinnedPos = { x: event.pageX + padding, y: event.pageY + padding };
+            renderTooltip(d, getAncestors(d));
+            tooltip
+                .style("opacity", 1)
+                .style("left", `${pinnedPos.x}px`)
+                .style("top", `${pinnedPos.y}px`);
+            highlightOnly(d);
         }
 
         // Función para obtener todos los ancestros de un nodo
@@ -163,9 +216,16 @@ document.addEventListener('DOMContentLoaded', () => {
             return path;
         }
 
-        function renderTooltip(d, flavorNames) {
+        function highlightOnly(d) {
+            segment.classed("highlight", node => node === d);
+            segment.classed("fade", node => node !== d);
+        }
+
+        function renderTooltip(d, sequence) {
+            const flavorNames = sequence.map(node => node.data.name).join(" > ");
             const ref = d.data.reference;
-            let html = `<div class="tooltip-path">${flavorNames}</div>`;
+            const crumbs = sequence.map(node => `<span class="crumb" data-node-id="${node.data._id}">${node.data.name}</span>`).join("");
+            let html = `<div class="tooltip-path">${crumbs}</div>`;
             html += `<div class="tooltip-title">${d.data.name}</div>`;
             if (d.data.definition) {
                 html += `<div class="tooltip-def">${d.data.definition}</div>`;
@@ -177,6 +237,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             tooltip.html(html);
         }
+
+        tooltip.on("click", (event) => {
+            event.stopPropagation();
+            const target = event.target.closest("[data-node-id]");
+            if (target) {
+                const node = nodeById.get(target.dataset.nodeId);
+                if (node) {
+                    pinned = node;
+                    const box = tooltip.node().getBoundingClientRect();
+                    pinnedPos = { x: box.left + window.scrollX, y: box.top + window.scrollY };
+                    renderTooltip(node, getAncestors(node));
+                    tooltip.style("opacity", 1);
+                    highlightOnly(node);
+                }
+            }
+        });
+
+        d3.select(window).on("click", () => {
+            pinned = null;
+            tooltip.style("opacity", 0);
+            segment.classed("highlight", false);
+        });
 
     }).catch(function(error){
         console.error("Error al cargar o procesar el archivo JSON:", error);
