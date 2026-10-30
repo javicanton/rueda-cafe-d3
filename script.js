@@ -255,8 +255,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 html += `<div class="tooltip-def">${d.data.definition}</div>`;
             }
             if (ref && (ref.example || ref.intensity || ref.preparation)) {
-                html += `<table><thead><tr><th>Referencia</th><th>Intensidad</th><th>Preparación</th></tr></thead><tbody>`;
-                html += `<tr><td>${ref.example || ''}</td><td>${ref.type ? ref.type + (ref.intensity ? `: ${ref.intensity}` : '') : (ref.intensity || '')}</td><td>${ref.preparation || ''}</td></tr>`;
+                const hasPrep = ref.preparation && ref.preparation !== '—';
+                html += `<table><thead><tr><th>Referencia</th><th>Intensidad</th>${hasPrep ? '<th>Preparación</th>' : ''}</tr></thead><tbody>`;
+                html += `<tr><td>${ref.example || ''}</td><td>${ref.type ? ref.type + (ref.intensity ? `: ${ref.intensity}` : '') : (ref.intensity || '')}</td>${hasPrep ? `<td>${ref.preparation}</td>` : ''}</tr>`;
                 html += `</tbody></table>`;
             }
             tooltip.html(html);
