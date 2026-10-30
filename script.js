@@ -255,9 +255,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 html += `<div class="tooltip-def">${d.data.definition}</div>`;
             }
             if (ref && (ref.example || ref.intensity || ref.preparation)) {
-                html += `<table><thead><tr><th>Referencia</th><th>Intensidad</th><th>Preparación</th></tr></thead><tbody>`;
-                html += `<tr><td>${ref.example || ''}</td><td>${ref.type ? ref.type + (ref.intensity ? `: ${ref.intensity}` : '') : (ref.intensity || '')}</td><td>${ref.preparation || ''}</td></tr>`;
-                html += `</tbody></table>`;
+                const hasIntensity = ref.intensity && ref.intensity !== '—';
+                const hasPrep = ref.preparation && ref.preparation !== '—';
+                const intensityText = hasIntensity ? (ref.type ? `${ref.type}: ${ref.intensity}` : ref.intensity) : '';
+                const hasTable = ref.example || hasIntensity || hasPrep;
+                if (hasTable) {
+                    html += '<table><thead><tr>';
+                    if (ref.example) html += '<th>Referencia</th>';
+                    if (hasIntensity) html += '<th>Intensidad</th>';
+                    if (hasPrep) html += '<th>Preparación</th>';
+                    html += '</tr></thead><tbody><tr>';
+                    if (ref.example) html += `<td>${ref.example}</td>`;
+                    if (hasIntensity) html += `<td>${intensityText}</td>`;
+                    if (hasPrep) html += `<td>${ref.preparation}</td>`;
+                    html += '</tr></tbody></table>';
+                }
             }
             tooltip.html(html);
         }

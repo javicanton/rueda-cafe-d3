@@ -11,7 +11,7 @@ body {
 
 .container {
     text-align: center;
-    max-width: 900px;
+    max-width: 1060px;
 }
 
 h1 {
@@ -20,11 +20,22 @@ h1 {
     font-weight: 700;
 }
 
+.footnote {
+    margin-top: 18px;
+    font-size: 13px;
+    color: #888;
+    line-height: 1.5;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .wheel-container {
     display: inline-block;
     background-color: #fff;
     border-radius: 50%;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    padding: 70px;
 }
 
 #flavor-info {
@@ -68,7 +79,6 @@ h1 {
     font-size: 11px;
     font-weight: 600;
     pointer-events: none;
-    text-anchor: start;
     fill: #000;
     font-family: Arial, Helvetica, sans-serif;
     text-shadow: 0 0 3px #fff;
