@@ -11,14 +11,15 @@ body {
 
 .container {
     text-align: center;
-    width: min(1120px, 100%);
-    padding: 28px 16px 48px;
+    width: min(1400px, 100%);
+    padding: 12px 12px 16px;
+    box-sizing: border-box;
 }
 
 .lang-switch {
     display: inline-flex;
     border: 1px solid #1a1a1a;
-    margin-bottom: 14px;
+    margin-bottom: 8px;
 }
 
 .lang-tab {
@@ -51,9 +52,9 @@ body {
 
 h1 {
     color: #1a1a1a;
-    margin: 0 0 8px;
+    margin: 0 0 4px;
     font-weight: 600;
-    font-size: 22px;
+    font-size: 18px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
 }
@@ -71,14 +72,16 @@ h1 {
 
 .wheel-container {
     display: block;
+    width: min(100%, calc(100vh - 112px));
+    margin: 0 auto;
 }
 
 #coffee-wheel {
-    width: min(1080px, 100%);
+    width: 100%;
     height: auto;
+    aspect-ratio: 1 / 1;
     display: block;
-    margin: 0 auto;
-    overflow: visible;
+    overflow: hidden;
 }
 
 #flavor-info {

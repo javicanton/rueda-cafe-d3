@@ -1,10 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    const width = 1080;
-    const height = 1080;
-    const radius = 390;
-
-    const leafTrim = radius * 0.26;
+    const width = 1400;
+    const height = 1400;
+    const hub = 18;
+    const colorRadius = 500;
 
     const svg = d3.select("#coffee-wheel")
         .attr("viewBox", `0 0 ${width} ${height}`)
@@ -281,11 +280,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return [name];
     }
 
-    const hub = 46;
-
     function radiusAt(t) {
         const clamped = Math.max(0, Math.min(1, t));
-        return hub + (radius - hub) * Math.pow(clamped, 1.3);
+        return hub + (colorRadius - hub) * clamped;
     }
 
     function syncChrome() {
@@ -377,14 +374,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const arc = d3.arc()
                 .startAngle(d => d.x0)
                 .endAngle(d => d.x1)
-                .padAngle(0.001)
-                .padRadius(radius)
+                .padAngle(0.0012)
+                .padRadius(colorRadius)
                 .innerRadius(d => radiusAt((d.depth - 1) / maxDepth))
-                .outerRadius(d => {
-                    const outer = radiusAt(d.depth / maxDepth);
-                    const inner = radiusAt((d.depth - 1) / maxDepth);
-                    return d.depth === maxDepth ? Math.max(outer - leafTrim, inner + 8) : outer;
-                });
+                .outerRadius(d => radiusAt(d.depth / maxDepth));
 
             const nodes = root.descendants().filter(d => d.depth > 0);
             nodes.forEach((d, idx) => {
@@ -455,7 +448,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const midAngle = (d.x0 + d.x1) / 2;
                     const angleDeg = midAngle * 180 / Math.PI;
                     const isRightSide = Math.sin(midAngle) >= 0;
-                    const r = radiusAt(1) - leafTrim + 14;
+                    const r = colorRadius + 6;
                     const rotate = angleDeg - 90;
                     return `rotate(${rotate}) translate(${r},0) rotate(${isRightSide ? 0 : 180})`;
                 });
