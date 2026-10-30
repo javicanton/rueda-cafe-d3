@@ -3,25 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rueda de Sabor del Café</title>
+    <title>Rueda de sabor del café</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <div class="container">
-        <h1>Rueda de Sabor del Café</h1>
-        <div class="wheel-container">
-            <svg id="coffee-wheel" width="880" height="880"></svg>
+        <div class="lang-switch" role="tablist" aria-label="Idioma">
+            <button type="button" class="lang-tab is-active" role="tab" id="tab-es" data-lang="es" aria-selected="true" aria-controls="coffee-wheel">ES</button>
+            <button type="button" class="lang-tab" role="tab" id="tab-en" data-lang="en" aria-selected="false" aria-controls="coffee-wheel">EN</button>
         </div>
-        <p class="footnote">Datos basados en la <em>Coffee Taster's Flavor Wheel</em> de la <abbr title="Specialty Coffee Association">SCA</abbr> (2016) y el <em>Sensory Lexicon</em> de <abbr title="World Coffee Research">WCR</abbr>. Traducción y adaptación al español por Javier Cantón.</p>
+        <h1 id="wheel-title">Rueda de sabor del café</h1>
+        <div class="wheel-container">
+            <svg id="coffee-wheel" viewBox="0 0 1080 1080" width="1080" height="1080" role="img" aria-labelledby="wheel-title"></svg>
+        </div>
+        <p class="footnote" id="footnote">Datos basados en la <em>Coffee Taster's Flavor Wheel</em> de la <abbr title="Specialty Coffee Association">SCA</abbr> (2016) y el <em>Sensory Lexicon</em> de <abbr title="World Coffee Research">WCR</abbr>. Traducción y adaptación al español por Javier Cantón.</p>
     </div>
 
-    <!-- Carga de la librería D3.js -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <!-- Nuestro script -->
     <script src="script.js"></script>
 </body>
 </html>
