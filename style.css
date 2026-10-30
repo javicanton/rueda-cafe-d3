@@ -20,6 +20,16 @@ h1 {
     font-weight: 700;
 }
 
+.footnote {
+    margin-top: 18px;
+    font-size: 13px;
+    color: #888;
+    line-height: 1.5;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .wheel-container {
     display: inline-block;
     background-color: #fff;
